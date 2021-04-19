@@ -1,0 +1,15 @@
+@use "./colors" as clr;
+
+body {
+    font-family: "Segoe UI", sans-serif;
+    
+    background-color: clr.$neutral-050;
+    color: clr.$neutral-900;
+
+    min-height: 100vh;
+}
+
+.container {
+    width: min(85%, 1200px);
+    margin: auto;
+}

@@ -1,0 +1,12 @@
+@use "./colors" as clr;
+
+.header {
+    padding: 1em 0;
+}
+
+.header__title {
+    font-size: min(10vw, 3rem);
+
+    margin: 0;
+    padding: 0;
+}

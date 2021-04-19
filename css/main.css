@@ -1,0 +1,111 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: #ebebeb;
+  color: #141414;
+  min-height: 100vh;
+}
+
+.container {
+  width: min(85%, 1200px);
+  margin: auto;
+}
+
+.header {
+  padding: 1em 0;
+}
+
+.header__title {
+  font-size: min(10vw, 3rem);
+  margin: 0;
+  padding: 0;
+}
+
+.calendar {
+  background-color: white;
+  padding: 1em;
+}
+
+.calendar__title {
+  font-weight: 400;
+  font-size: min(2.2rem, 9vw);
+  text-align: center;
+  padding-bottom: 1em;
+}
+
+.calendar__headings {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+}
+.calendar__headings > li {
+  width: 100%;
+}
+
+.calendar__heading {
+  text-align: center;
+  font-weight: bold;
+  font-size: min(6vw, 1.3rem);
+  padding-bottom: 1em;
+}
+
+.calendar__cells {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar__cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: min(20vw, 5rem);
+  font-size: min(6vw, 1.1rem);
+  padding-top: 0.5em;
+  border-radius: 0.3em;
+  transition: box-shadow 50ms linear;
+}
+
+.calendar__cell:hover,
+.calendar__cell:focus {
+  outline: none;
+  box-shadow: 0 0 10px #999999;
+  z-index: 2;
+  cursor: pointer;
+  transition: box-shadow 200ms linear;
+}
+
+.calendar__dot {
+  width: min(2vw, 0.5rem);
+  height: min(2vw, 0.5rem);
+  margin: min(2vw, 0.5rem);
+  background-color: #e61a5e;
+  border-radius: 50%;
+}
+
+.calendar__cell--today {
+  z-index: 3;
+  background-color: #e61a5e;
+  color: white;
+  font-weight: bold;
+}
+.calendar__cell--today .calendar__dot {
+  background-color: white;
+}
+
+/*# sourceMappingURL=main.css.map */
