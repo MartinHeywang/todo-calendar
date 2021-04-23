@@ -36,9 +36,59 @@ body {
   padding: 0;
 }
 
+@media (min-width: 40em) {
+  .tasks .container {
+    display: flex;
+  }
+  .tasks .container > * + * {
+    margin-left: 1em;
+  }
+  .tasks .calendar {
+    flex: 2;
+  }
+}
+
+.task-list {
+  flex: 1;
+  padding: 1em;
+  margin: 1em 0;
+  max-height: 90vh;
+  background-color: white;
+  overflow-y: scroll;
+}
+
+.task {
+  padding: 1.5em clamp(1em, 1vw, 2.2em);
+  background-color: #1a80e6;
+  color: white;
+}
+
+.task__title {
+  font-size: min(2vw, 1.4rem);
+}
+
+.task__actions {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  margin-top: 0.75em;
+  padding: 0;
+}
+.task__actions > * + * {
+  margin-left: 0.5em;
+}
+
+.task__action {
+  display: inline;
+  font-size: min(5vw, 1rem);
+  text-decoration: underline;
+}
+
 .calendar {
   background-color: white;
   padding: 1em;
+  margin: 1em 0;
 }
 
 .calendar__title {
@@ -84,7 +134,7 @@ body {
 .calendar__cell:hover,
 .calendar__cell:focus {
   outline: none;
-  box-shadow: 0 0 10px #999999;
+  box-shadow: 0 0 7px #999999;
   z-index: 2;
   cursor: pointer;
   transition: box-shadow 200ms linear;
