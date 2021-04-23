@@ -13,3 +13,18 @@ body {
     width: min(85%, 1200px);
     margin: auto;
 }
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+button {
+    display: block;
+    border: 0;
+    border-radius: 0;
+}
+
+button:hover {
+    cursor: pointer;
+}

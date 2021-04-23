@@ -27,13 +27,17 @@
     background-color: white;
 
     overflow-y: scroll;
+
+    > * + * {
+        margin-top: 1em;
+    }
 }
 
 .task {
     padding: 1.5em clamp(1em, 1vw, 2.2em);
 
-    background-color: clr.$secondary-500;
-    color: white;
+    background-color: clr.$primary-300;
+    color: mix(clr.$secondary-500, black, 20%);
 }
 
 .task__title {

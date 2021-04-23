@@ -1,6 +1,6 @@
 export interface Task {
+    id: number,
     title: string
-    color: string
     createdAt: number
     startDate: number,
     endDate: number,
@@ -8,10 +8,10 @@ export interface Task {
     link?: string
 }
 
-const tasks = [
+const tasks: Task[] = [ 
     {
+        id: 1,
         title: "Homework",
-        color: "darkorange",
         createdAt: Date.UTC(2021, 3, 18, 15),
         startDate: Date.UTC(2021, 3, 25, 7),
         endDate: Date.UTC(2021, 3, 27, 11),
@@ -30,6 +30,10 @@ export function hasTasks(date: Date) {
     ).length !== 0
         ? true
         : false
+}
+
+export function addTask(task: Task) {
+    tasks.push(task)
 }
 
 export function sameDay(firstDate: Date, secondDate: Date) {

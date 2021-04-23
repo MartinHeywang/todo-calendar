@@ -1,0 +1,26 @@
+@use "./colors" as clr;
+@use "./breakpoints" as brk;
+
+.input {
+    display: flex;
+    flex-direction: column;
+
+    padding: 0.5em 0;
+}
+
+.input__label {
+    font-size: min(8vw, 1rem);
+    color: mix(clr.$primary-700, black, 60%);
+}
+
+.input__field {
+    border: 0;
+    border-radius: 0;
+    padding: 0.5em;
+    font-size: "Segoe UI";
+}
+
+.input__field:focus,
+.input__field:hover {
+    outline: 2px solid clr.$primary-700;
+}

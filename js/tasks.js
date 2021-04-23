@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.sameDay = exports.hasTasks = exports.getTasks = void 0;
-var tasks = [
+const tasks = [
     {
+        id: 1,
         title: "Homework",
-        color: "darkorange",
         createdAt: Date.UTC(2021, 3, 18, 15),
         startDate: Date.UTC(2021, 3, 25, 7),
         endDate: Date.UTC(2021, 3, 27, 11),
@@ -12,23 +9,20 @@ var tasks = [
         link: "https://lyc-koeberle.monbureaunumerique.fr",
     },
 ];
-function getTasks() {
+export function getTasks() {
     return tasks;
 }
-exports.getTasks = getTasks;
-function hasTasks(date) {
+export function hasTasks(date) {
     var _a;
-    return ((_a = tasks.filter(function (_a) {
-        var endDate = _a.endDate;
-        return sameDay(new Date(endDate), date);
-    })) !== null && _a !== void 0 ? _a : []).length !== 0
+    return ((_a = tasks.filter(({ endDate }) => sameDay(new Date(endDate), date))) !== null && _a !== void 0 ? _a : []).length !== 0
         ? true
         : false;
 }
-exports.hasTasks = hasTasks;
-function sameDay(firstDate, secondDate) {
+export function addTask(task) {
+    tasks.push(task);
+}
+export function sameDay(firstDate, secondDate) {
     return (firstDate.getFullYear() === secondDate.getFullYear() &&
         firstDate.getMonth() === secondDate.getMonth() &&
         firstDate.getDate() === secondDate.getDate());
 }
-exports.sameDay = sameDay;

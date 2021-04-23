@@ -26,14 +26,49 @@ body {
   margin: auto;
 }
 
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  display: block;
+  border: 0;
+  border-radius: 0;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
 .header {
   padding: 1em 0;
+}
+@media (min-width: 40em) {
+  .header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 }
 
 .header__title {
   font-size: min(10vw, 3rem);
   margin: 0;
   padding: 0;
+}
+
+.header__button {
+  border: 0;
+  background-color: #1a80e6;
+  color: white;
+  padding: 0.5em 1em;
+  font-size: min(6vw, 1.3rem);
+}
+@media (max-width: 40em) {
+  .header__button {
+    margin-top: 1em;
+  }
 }
 
 @media (min-width: 40em) {
@@ -56,11 +91,14 @@ body {
   background-color: white;
   overflow-y: scroll;
 }
+.task-list > * + * {
+  margin-top: 1em;
+}
 
 .task {
   padding: 1.5em clamp(1em, 1vw, 2.2em);
-  background-color: #1a80e6;
-  color: white;
+  background-color: #db7094;
+  color: #051a2e;
 }
 
 .task__title {
@@ -156,6 +194,94 @@ body {
 }
 .calendar__cell--today .calendar__dot {
   background-color: white;
+}
+
+.input {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5em 0;
+}
+
+.input__label {
+  font-size: min(8vw, 1rem);
+  color: #8a1038;
+}
+
+.input__field {
+  border: 0;
+  border-radius: 0;
+  padding: 0.5em;
+  font-size: "Segoe UI";
+}
+
+.input__field:focus,
+.input__field:hover {
+  outline: 2px solid #e61a5e;
+}
+
+.modal {
+  z-index: 11;
+  position: absolute;
+  top: 10vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 450px;
+  padding: 1.2em;
+  background-color: #ebebeb;
+  color: #141414;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal__content button,
+.modal__content input {
+  width: 100%;
+  padding: 0.5em;
+}
+.modal__content button:hover,
+.modal__content button:focus,
+.modal__content input:hover,
+.modal__content button:focus {
+  outline: 2px solid #e61a5e;
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal__title {
+  font-size: min(8vw, 1.5em);
+}
+
+.modal__close {
+  border: 0;
+  background-color: transparent;
+  text-decoration: underline;
+  padding: 0.5em;
+}
+
+.modal__close:hover {
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.modal__submit {
+  margin-top: 1.5em;
+  background-color: #e61a5e;
+  color: white;
+}
+
+#page-mask {
+  display: none;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 
 /*# sourceMappingURL=main.css.map */

@@ -1,7 +1,16 @@
 @use "./colors" as clr;
+@use "./breakpoints" as brk;
 
 .header {
     padding: 1em 0;
+
+    @media (min-width: brk.$small) {
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
 }
 
 .header__title {
@@ -9,4 +18,16 @@
 
     margin: 0;
     padding: 0;
+}
+
+.header__button {
+    border: 0;
+    background-color: clr.$secondary-500;
+    color: white;
+    padding: 0.5em 1em;
+    font-size: min(6vw, 1.3rem);
+
+    @media (max-width: brk.$small) {
+        margin-top: 1em;
+    }
 }
