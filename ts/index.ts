@@ -1,25 +1,13 @@
+import {
+    beautifyDate,
+    getDaysOfWeek,
+    getEndingOfMonth,
+    getSundayAfter,
+    isSameDay,
+    listDays,
+} from "./dateUtils.js";
 import * as tasks from "./tasks.js";
-
-interface Months {
-    [key: number]: string;
-}
-
-const months: Months = {
-    "0": "January",
-    "1": "February",
-    "2": "March",
-    "3": "April",
-    "4": "May",
-    "5": "June",
-    "6": "July",
-    "7": "August",
-    "8": "September",
-    "9": "October",
-    "10": "November",
-    "11": "December",
-};
-
-const days = ["M", "T", "W", "T", "F", "S", "S"];
+import { getMondayBefore, getBeginningOfMonth } from "./dateUtils.js";
 
 type Component = (...args: any) => { element: HTMLElement; [x: string]: any };
 
@@ -29,11 +17,11 @@ const Calendar: Component = (startDate: Date) => {
 
     const title = document.createElement("h2");
     title.classList.add("calendar__title");
-    title.textContent = `${months[startDate.getMonth()]} ${startDate.getFullYear()}`;
+    title.textContent = beautifyDate(getBeginningOfMonth(startDate));
 
     const headings = document.createElement("ul");
     headings.classList.add("calendar__headings");
-    days.forEach((day) => {
+    getDaysOfWeek().forEach((day) => {
         const heading = document.createElement("li");
         heading.textContent = day;
         heading.classList.add("calendar__heading", `calendar__${day.toLowerCase()}`);
@@ -44,54 +32,37 @@ const Calendar: Component = (startDate: Date) => {
     const cells = document.createElement("div");
     cells.classList.add("calendar__cells");
 
-    const millisInDay = 1 * 24 * 60 * 60 * 1000;
-    const firstOfMonth = new Date(
-        Date.UTC(startDate.getFullYear(), startDate.getMonth(), 0)
-    );
-
-    const firstDayInCalendar = new Date(
-        firstOfMonth.getTime() - (firstOfMonth.getDay() - 1) * millisInDay
-    );
-
-    const lastDayInCalendar = new Date(
-        firstOfMonth.getTime() - firstOfMonth.getDay() * millisInDay + 35 * millisInDay
-    );
+    const firstDayInCalendar = getMondayBefore(getBeginningOfMonth(startDate));
+    const lastDayInCalendar = getSundayAfter(getEndingOfMonth(startDate));
 
     const update = () => {
-        cells.innerHTML = ""
-        for (
-            let i = firstDayInCalendar.getTime();
-            i <= lastDayInCalendar.getTime();
-            i += millisInDay
-        ) {
-            cells.appendChild(CalendarCell(new Date(new Date(i))).element);
-        }
-    }
-    update()
+        cells.innerHTML = "";
+
+        listDays(firstDayInCalendar, lastDayInCalendar).forEach((day) => {
+            cells.appendChild(CalendarCell(day).element);
+        });
+    };
+    update();
 
     calendar.append(title, headings, cells);
 
     return { element: calendar, update };
 };
 
-const CalendarCell: Component = (day: Date) => {
+const CalendarCell: Component = (date: Date) => {
     const cell = document.createElement("div");
     cell.classList.add("calendar__cell");
     cell.setAttribute("tabindex", "1");
 
     const today = new Date(Date.now());
 
-    if (
-        day.getFullYear() === today.getFullYear() &&
-        day.getMonth() === today.getMonth() &&
-        day.getDate() === today.getDate()
-    ) {
+    if (isSameDay(date, today)) {
         cell.classList.add("calendar__cell--today");
     }
 
-    cell.append(day.getDate().toString());
+    cell.append(date.getDate().toString());
 
-    const hasDayEvents = tasks.hasTasks(day);
+    const hasDayEvents = tasks.hasTasks(date);
     if (hasDayEvents) {
         const dot = document.createElement("div");
         dot.classList.add("calendar__dot");
@@ -107,13 +78,13 @@ const TaskList: Component = () => {
 
     const update = () => {
         const taskModels = tasks.getTasks();
-        taskList.innerHTML = ""
+        taskList.innerHTML = "";
 
         taskModels.forEach((taskModel) => {
             taskList.appendChild(Task(taskModel).element);
-        })
-    }
-    update()
+        });
+    };
+    update();
 
     return { element: taskList, update };
 };
@@ -148,11 +119,7 @@ const Task: Component = (taskModel: tasks.Task) => {
 const Duration: Component = (startDate: Date, endDate: Date) => {
     const duration = document.createElement("span");
 
-    const beautifyDate = (date: Date) => {
-        return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
-    };
-
-    if (tasks.sameDay(startDate, endDate)) {
+    if (isSameDay(startDate, endDate)) {
         duration.append(`${beautifyDate(startDate)}`);
     } else {
         duration.append(`${beautifyDate(startDate)} - ${beautifyDate(endDate)}`);
@@ -178,24 +145,24 @@ const Modal: Component = () => {
     const close = document.createElement("button");
     close.classList.add("modal__close");
     close.textContent = "Close";
-    
+
     header.append(title, close);
 
     const setTitle = (text: string) => {
         title.textContent = text;
     };
-    
+
     const setContent = (content: HTMLElement) => {
         const oldContent = root.children[1];
-        if(oldContent) {
+        if (oldContent) {
             root.removeChild(oldContent);
-            oldContent.classList.remove("modal__content")
+            oldContent.classList.remove("modal__content");
         }
 
-        content.classList.add("modal__content")
+        content.classList.add("modal__content");
         root.appendChild(content);
     };
-    
+
     const show = () => {
         root.style.display = "block";
         pageMask.style.display = "unset";
@@ -205,8 +172,8 @@ const Modal: Component = () => {
         root.style.display = "none";
         pageMask.style.display = "none";
     };
-    close.addEventListener("click", hide)
-    
+    close.addEventListener("click", hide);
+
     return { element: root, setTitle, setContent, show, hide };
 };
 
@@ -216,22 +183,30 @@ const Input: Component = (text: string, type = "text", className = "") => {
 
     const label = document.createElement("label");
     label.textContent = text;
-    label.classList.add("input__label")
+    label.classList.add("input__label");
 
     const input = document.createElement("input");
     input.setAttribute("type", type);
-    input.classList.add("input__field", `input__field-${type}`)
+    input.classList.add("input__field", `input__field-${type}`);
 
-    root.append(label, input)
+    const problem = document.createElement("p")
+    problem.classList.add("input__problem")
+    problem.textContent = ""
+
+    const setProblem = (text: string) => {
+        problem.textContent = text
+    }
+
+    root.append(label, input, problem);
 
     const value = () => input.value;
 
-    return { element: root, value };
+    return { element: root, value, setProblem };
 };
 
 const calendarContainer = document.querySelector(".tasks .container");
-const calendar = Calendar(new Date(Date.now()))
-const taskList = TaskList()
+const calendar = Calendar(new Date(Date.now()));
+const taskList = TaskList();
 
 calendarContainer?.appendChild(calendar.element);
 calendarContainer?.appendChild(taskList.element);
@@ -239,35 +214,49 @@ calendarContainer?.appendChild(taskList.element);
 const addBtn = document.querySelector(".header__button");
 addBtn?.addEventListener("click", (_) => {
     const modal = Modal();
-    
-    const form = document.createElement("div")
+
+    const form = document.createElement("div");
     const title = Input("Title*", "text", "modal__title");
     const desc = Input("Description", "text", "modal__desc");
     const startDate = Input("Start Date", "date", "modal__start-date");
     const endDate = Input("End date*", "date", "modal__end-date");
     const link = Input("Link", "text", "modal__link");
 
-    const submit = document.createElement("button")
-    submit.textContent = "Save!"
-    submit.classList.add("modal__submit")
+    const submit = document.createElement("button");
+    submit.textContent = "Save!";
+    submit.classList.add("modal__submit");
 
     submit.addEventListener("click", () => {
+        if(title.value() === "" || title.value() == undefined) {
+            return title.setProblem("You must provide a title.")
+        }
+        if(endDate.value() === "" || endDate.value() == undefined) {
+            return endDate.setProblem("You must provide an ending date for the event.")
+        }
+
         const task: tasks.Task = {
             id: -1,
             title: title.value(),
-            description: desc.value(),
+            description: desc.value() || "",
             createdAt: Date.now(),
-            startDate: Date.parse(startDate.value()),
+            startDate: Date.parse(startDate.value()) || Date.parse(endDate.value()),
             endDate: Date.parse(endDate.value()),
-            link: link.value()
-        }
-        tasks.addTask(task)
-        taskList.update()
-        calendar.update()
-        modal.hide()
-    })
+            link: link.value() || undefined,
+        };
+        tasks.addTask(task);
+        taskList.update();
+        calendar.update();
+        modal.hide();
+    });
 
-    form.append(title.element, desc.element, startDate.element, endDate.element, link.element, submit)
+    form.append(
+        title.element,
+        desc.element,
+        startDate.element,
+        endDate.element,
+        link.element,
+        submit
+    );
     modal.setTitle("Add an event");
     modal.setContent(form);
 

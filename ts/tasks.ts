@@ -1,14 +1,16 @@
+import { isSameDay } from "./dateUtils.js";
+
 export interface Task {
-    id: number,
-    title: string
-    createdAt: number
-    startDate: number,
-    endDate: number,
-    description?: string,
-    link?: string
+    id: number;
+    title: string;
+    createdAt: number;
+    startDate: number;
+    endDate: number;
+    description?: string;
+    link?: string;
 }
 
-const tasks: Task[] = [ 
+const tasks: Task[] = [
     {
         id: 1,
         title: "Homework",
@@ -18,28 +20,16 @@ const tasks: Task[] = [
         description: "Work for school. See MonBureauNumerique.",
         link: "https://lyc-koeberle.monbureaunumerique.fr",
     },
-]
+];
 
 export function getTasks() {
-    return tasks
+    return tasks;
 }
 
 export function hasTasks(date: Date) {
-    return (
-        tasks.filter(({ endDate }) => sameDay(new Date(endDate), date)) ?? []
-    ).length !== 0
-        ? true
-        : false
+    return tasks.some(({ endDate }) => isSameDay(new Date(endDate), date));
 }
 
 export function addTask(task: Task) {
-    tasks.push(task)
-}
-
-export function sameDay(firstDate: Date, secondDate: Date) {
-    return (
-        firstDate.getFullYear() === secondDate.getFullYear() &&
-        firstDate.getMonth() === secondDate.getMonth() &&
-        firstDate.getDate() === secondDate.getDate()
-    )
+    tasks.push(task);
 }

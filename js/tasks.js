@@ -1,3 +1,4 @@
+import { isSameDay } from "./dateUtils.js";
 const tasks = [
     {
         id: 1,
@@ -13,16 +14,8 @@ export function getTasks() {
     return tasks;
 }
 export function hasTasks(date) {
-    var _a;
-    return ((_a = tasks.filter(({ endDate }) => sameDay(new Date(endDate), date))) !== null && _a !== void 0 ? _a : []).length !== 0
-        ? true
-        : false;
+    return tasks.some(({ endDate }) => isSameDay(new Date(endDate), date));
 }
 export function addTask(task) {
     tasks.push(task);
-}
-export function sameDay(firstDate, secondDate) {
-    return (firstDate.getFullYear() === secondDate.getFullYear() &&
-        firstDate.getMonth() === secondDate.getMonth() &&
-        firstDate.getDate() === secondDate.getDate());
 }

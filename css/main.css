@@ -219,6 +219,13 @@ button:hover {
   outline: 2px solid #e61a5e;
 }
 
+.input__problem {
+  margin: 0;
+  margin-top: 0.5em;
+  font-size: min(5vw, 0.8rem);
+  color: #e61a5e;
+}
+
 .modal {
   z-index: 11;
   position: absolute;

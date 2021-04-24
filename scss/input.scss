@@ -24,3 +24,10 @@
 .input__field:hover {
     outline: 2px solid clr.$primary-700;
 }
+
+.input__problem {
+    margin: 0;
+    margin-top: 0.5em;
+    font-size: min(5vw, 0.8rem);
+    color: clr.$primary-700;
+}
