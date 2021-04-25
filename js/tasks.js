@@ -1,13 +1,10 @@
 import { isSameDay } from "./dateUtils.js";
 const tasks = [
     {
-        id: 1,
         title: "Homework",
         createdAt: Date.UTC(2021, 3, 18, 15),
         startDate: Date.UTC(2021, 3, 25, 7),
         endDate: Date.UTC(2021, 3, 27, 11),
-        description: "Work for school. See MonBureauNumerique.",
-        link: "https://lyc-koeberle.monbureaunumerique.fr",
     },
 ];
 export function getTasks() {
@@ -16,6 +13,16 @@ export function getTasks() {
 export function hasTasks(date) {
     return tasks.some(({ endDate }) => isSameDay(new Date(endDate), date));
 }
+export function getID(task) {
+    return tasks.indexOf(task);
+}
 export function addTask(task) {
     tasks.push(task);
+}
+export function updateTask(oldTask, newTask) {
+    deleteTask(getID(oldTask));
+    addTask(newTask);
+}
+export function deleteTask(id) {
+    tasks.splice(id, 1);
 }

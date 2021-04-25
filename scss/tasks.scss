@@ -62,5 +62,15 @@
     display: inline;
     font-size: min(5vw, 1rem);
     text-decoration: underline;
-    
+    padding: 0.25em 0.3em;
+
+    > * + * {
+        margin-left: 0.25em;
+        margin-top: 0.5em;
+    }
+}
+
+.task__action:hover {
+    cursor: pointer;
+    background-color: rgba(black, 20%);
 }

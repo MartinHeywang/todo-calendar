@@ -15,7 +15,7 @@ const months = {
 const days = ["M", "T", "W", "T", "F", "S", "S"];
 const millisInDay = 24 * 60 * 60 * 1000;
 export function isSameDay(firstDate, secondDate) {
-    return getBeginningOfDay(firstDate).getTime() === getBeginningOfDay(secondDate).getTime();
+    return (getBeginningOfDay(firstDate).getTime() === getBeginningOfDay(secondDate).getTime());
 }
 export function beautifyDate(date) {
     let result = "";
@@ -66,4 +66,17 @@ export function getDaysOfWeek() {
 }
 export function getMonthsOfYear() {
     return Object.freeze(months);
+}
+export function toISO(date) {
+    if (typeof date === "number") {
+        date = new Date(date);
+    }
+    let month = "" + (date.getMonth() + 1);
+    let day = "" + date.getDate();
+    let year = date.getFullYear();
+    if (month.length < 2)
+        month = "0" + month;
+    if (day.length < 2)
+        day = "0" + day;
+    return [year, month, day].join("-");
 }

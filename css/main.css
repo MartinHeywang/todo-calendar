@@ -121,6 +121,16 @@ button:hover {
   display: inline;
   font-size: min(5vw, 1rem);
   text-decoration: underline;
+  padding: 0.25em 0.3em;
+}
+.task__action > * + * {
+  margin-left: 0.25em;
+  margin-top: 0.5em;
+}
+
+.task__action:hover {
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .calendar {
