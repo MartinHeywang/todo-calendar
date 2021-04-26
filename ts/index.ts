@@ -9,11 +9,29 @@ import {
 } from "./dateUtils.js";
 
 import { getMondayBefore, getBeginningOfMonth } from "./dateUtils.js";
-import { addTask, deleteTask, getID, getTasks, hasTasks, Task, updateTask } from "./tasks.js";
+import {
+    addTask,
+    deleteTask,
+    getID,
+    getTasks,
+    hasTasks,
+    Task,
+    updateTask,
+} from "./tasks.js";
 
-type Component = (...args: any) => { element: HTMLElement; [x: string]: any };
+interface Component<Options, Returns> {
+    (options: Options): { element: HTMLElement } & Returns;
+}
 
-const Calendar: Component = (startDate: Date) => {
+interface CalendarOptions {
+    startDate: Date;
+}
+
+interface CalendarReturns {
+    update(): void;
+}
+
+const Calendar: Component<CalendarOptions, CalendarReturns> = ({ startDate }) => {
     const calendar = document.createElement("div");
     calendar.classList.add("calendar");
 
@@ -41,7 +59,7 @@ const Calendar: Component = (startDate: Date) => {
         cells.innerHTML = "";
 
         listDays(firstDayInCalendar, lastDayInCalendar).forEach((day) => {
-            cells.appendChild(CalendarCell(day).element);
+            cells.appendChild(CalendarCell({ date: day }).element);
         });
     };
     update();
@@ -51,7 +69,11 @@ const Calendar: Component = (startDate: Date) => {
     return { element: calendar, update };
 };
 
-const CalendarCell: Component = (date: Date) => {
+interface CalendarCellOptions {
+    date: Date;
+}
+
+const CalendarCell: Component<CalendarCellOptions, {}> = ({ date }) => {
     const cell = document.createElement("div");
     cell.classList.add("calendar__cell");
     cell.setAttribute("tabindex", "1");
@@ -74,7 +96,11 @@ const CalendarCell: Component = (date: Date) => {
     return { element: cell };
 };
 
-const TaskList: Component = () => {
+interface TaskListReturns {
+    update(): void;
+}
+
+const TaskList: Component<{}, TaskListReturns> = ({}) => {
     const taskList = document.createElement("div");
     taskList.classList.add("task-list");
 
@@ -83,7 +109,7 @@ const TaskList: Component = () => {
         taskList.innerHTML = "";
 
         taskModels.forEach((taskModel) => {
-            taskList.appendChild(TaskCard(taskModel).element);
+            taskList.appendChild(TaskCard({ taskModel }).element);
         });
 
         if (taskList.children.length === 0) {
@@ -95,7 +121,11 @@ const TaskList: Component = () => {
     return { element: taskList, update };
 };
 
-const TaskCard: Component = (taskModel: Task) => {
+interface TaskCardOptions {
+    taskModel: Task;
+}
+
+const TaskCard: Component<TaskCardOptions, {}> = ({ taskModel }) => {
     const task = document.createElement("div");
     task.classList.add("task");
 
@@ -115,17 +145,16 @@ const TaskCard: Component = (taskModel: Task) => {
     type Action = { name: string; onClick: () => void };
 
     const actionsDesc: Action[] = [
-        { name: "View", onClick: () => {} },
         {
             name: "Edit",
             onClick: () => {
-                const modal = Modal();
+                const modal = Modal({});
 
                 modal.setTitle("Edit an event");
 
                 const modalContent = document.createElement("div");
 
-                console.log(taskModel)
+                console.log(taskModel);
 
                 const form = TaskForm({
                     defaultTitle: taskModel.title,
@@ -149,13 +178,13 @@ const TaskCard: Component = (taskModel: Task) => {
                     };
 
                     updateTask(taskModel, newTaskModel);
-                    taskModel = newTaskModel
+                    taskModel = newTaskModel;
 
-                    calendar.update()
-                    taskList.update()
+                    calendar.update();
+                    taskList.update();
 
-                    modal.hide()
-                })
+                    modal.hide();
+                });
 
                 modal.setContent(modalContent);
                 modal.show();
@@ -171,6 +200,13 @@ const TaskCard: Component = (taskModel: Task) => {
         },
     ];
 
+    if (taskModel.link != undefined) {
+        actionsDesc.unshift({
+            name: "Open Link",
+            onClick: () => (window.location.href = taskModel.link as string),
+        });
+    }
+
     actionsDesc.forEach((actionDesc) => {
         const action = document.createElement("li");
         action.textContent = actionDesc.name;
@@ -180,14 +216,22 @@ const TaskCard: Component = (taskModel: Task) => {
     });
 
     task.appendChild(
-        Duration(new Date(taskModel.startDate), new Date(taskModel.endDate)).element
+        Duration({
+            startDate: new Date(taskModel.startDate),
+            endDate: new Date(taskModel.endDate),
+        }).element
     );
     task.appendChild(actions);
 
     return { element: task };
 };
 
-const Duration: Component = (startDate: Date, endDate: Date) => {
+interface DurationOptions {
+    startDate: Date;
+    endDate: Date;
+}
+
+const Duration: Component<DurationOptions, {}> = ({ startDate, endDate }) => {
     const duration = document.createElement("span");
 
     if (isSameDay(startDate, endDate)) {
@@ -199,7 +243,14 @@ const Duration: Component = (startDate: Date, endDate: Date) => {
     return { element: duration };
 };
 
-const Modal: Component = () => {
+interface ModalReturns {
+    setTitle(text: string): void;
+    setContent(content: HTMLElement): void;
+    show(): void;
+    hide(): void;
+}
+
+const Modal: Component<{}, ModalReturns> = ({}) => {
     const pageMask = document.querySelector("#page-mask") as HTMLDivElement;
 
     const root = document.createElement("div");
@@ -250,21 +301,33 @@ const Modal: Component = () => {
     return { element: root, setTitle, setContent, show, hide };
 };
 
-const Input: Component = (
-    text: string,
-    options: { type: string; className: string; defaultValue: string }
-) => {
+interface InputOptions {
+    text: string;
+    type: string;
+    defaultValue: string;
+}
+
+interface InputReturns {
+    value(): string;
+    setProblem(text: string): void;
+}
+
+const Input: Component<InputOptions, InputReturns> = ({
+    text = "text",
+    type,
+    defaultValue,
+}) => {
     const root = document.createElement("div");
-    root.classList.add("input", options?.className);
+    root.classList.add("input");
 
     const label = document.createElement("label");
     label.textContent = text;
     label.classList.add("input__label");
 
     const input = document.createElement("input");
-    input.setAttribute("type", options.type || "text");
-    input.value = options.defaultValue || "";
-    input.classList.add("input__field", `input__field-${options.type || "text"}`);
+    input.setAttribute("type", type || "text");
+    input.value = defaultValue || "";
+    input.classList.add("input__field", `input__field-${type || "text"}`);
 
     const problem = document.createElement("p");
     problem.classList.add("input__problem");
@@ -281,41 +344,50 @@ const Input: Component = (
     return { element: root, value, setProblem };
 };
 
-const TaskForm: Component = (
-    options: {
-        defaultTitle?: string;
-        defaultDesc?: string;
-        defaultStartDate?: string;
-        defaultEndDate?: string;
-        defaultLink?: string;
-    } = {}
-) => {
+interface TaskFormOptions {
+    defaultTitle?: string;
+    defaultDesc?: string;
+    defaultStartDate?: string;
+    defaultEndDate?: string;
+    defaultLink?: string;
+}
+
+interface TaskFormReturns {
+    getValues(): {
+        title: string;
+        description: string;
+        startDate: number;
+        endDate: number;
+        link: string;
+    };
+    titleInput: InputReturns;
+    descInput: InputReturns;
+    startDateInput: InputReturns;
+    endDateInput: InputReturns;
+    linkInput: InputReturns;
+}
+
+const TaskForm: Component<TaskFormOptions, TaskFormReturns> = ({
+    defaultTitle = "",
+    defaultDesc = "",
+    defaultStartDate = "1970-01-01",
+    defaultEndDate = "1970-01-01",
+    defaultLink = "",
+}) => {
     const form = document.createElement("div");
-    const title = Input("Title*", {
-        type: "text",
-        className: "modal__title",
-        defaultValue: options.defaultTitle,
-    });
-    const desc = Input("Description", {
-        type: "text",
-        className: "modal__desc",
-        defaultValue: options.defaultDesc,
-    });
-    const startDate = Input("Start Date", {
+    const title = Input({ text: "Title*", type: "text", defaultValue: defaultTitle });
+    const desc = Input({ text: "Description", type: "text", defaultValue: defaultDesc });
+    const startDate = Input({
+        text: "Start Date",
         type: "date",
-        className: "modal__start-date",
-        defaultValue: options.defaultStartDate,
+        defaultValue: defaultStartDate,
     });
-    const endDate = Input("End date*", {
+    const endDate = Input({
+        text: "End date*",
         type: "date",
-        className: "modal__end-date",
-        defaultValue: options.defaultEndDate,
+        defaultValue: defaultEndDate,
     });
-    const link = Input("Link", {
-        type: "text",
-        className: "modal__link",
-        defaultValue: options.defaultLink,
-    });
+    const link = Input({ text: "Link", type: "text", defaultValue: defaultLink });
 
     form.append(
         title.element,
@@ -347,18 +419,18 @@ const TaskForm: Component = (
 };
 
 const calendarContainer = document.querySelector(".tasks .container");
-const calendar = Calendar(new Date(Date.now()));
-const taskList = TaskList();
+const calendar = Calendar({ startDate: new Date(Date.now()) });
+const taskList = TaskList({});
 
 calendarContainer?.appendChild(calendar.element);
 calendarContainer?.appendChild(taskList.element);
 
 const addBtn = document.querySelector(".header__button");
 addBtn?.addEventListener("click", (_) => {
-    const modal = Modal();
+    const modal = Modal({});
 
     const modalContent = document.createElement("div");
-    const form = TaskForm();
+    const form = TaskForm({});
     modalContent.appendChild(form.element);
 
     const submit = document.createElement("button");
@@ -369,10 +441,10 @@ addBtn?.addEventListener("click", (_) => {
     submit.addEventListener("click", () => {
         const values = form.getValues();
 
-        if (values.title === "" || values.title == undefined) {
+        if (!values.title) {
             return form.titleInput.setProblem("You must provide a title.");
         }
-        if (values.endDate === "" || values.endDate == undefined) {
+        if (!values.endDate) {
             return form.endDateInput.setProblem(
                 "You must provide an ending date for the event."
             );

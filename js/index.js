@@ -1,7 +1,7 @@
 import { beautifyDate, getDaysOfWeek, getEndingOfMonth, getSundayAfter, isSameDay, listDays, toISO, } from "./dateUtils.js";
 import { getMondayBefore, getBeginningOfMonth } from "./dateUtils.js";
-import { addTask, deleteTask, getID, getTasks, hasTasks, updateTask } from "./tasks.js";
-const Calendar = (startDate) => {
+import { addTask, deleteTask, getID, getTasks, hasTasks, updateTask, } from "./tasks.js";
+const Calendar = ({ startDate }) => {
     const calendar = document.createElement("div");
     calendar.classList.add("calendar");
     const title = document.createElement("h2");
@@ -22,14 +22,14 @@ const Calendar = (startDate) => {
     const update = () => {
         cells.innerHTML = "";
         listDays(firstDayInCalendar, lastDayInCalendar).forEach((day) => {
-            cells.appendChild(CalendarCell(day).element);
+            cells.appendChild(CalendarCell({ date: day }).element);
         });
     };
     update();
     calendar.append(title, headings, cells);
     return { element: calendar, update };
 };
-const CalendarCell = (date) => {
+const CalendarCell = ({ date }) => {
     const cell = document.createElement("div");
     cell.classList.add("calendar__cell");
     cell.setAttribute("tabindex", "1");
@@ -46,14 +46,14 @@ const CalendarCell = (date) => {
     }
     return { element: cell };
 };
-const TaskList = () => {
+const TaskList = ({}) => {
     const taskList = document.createElement("div");
     taskList.classList.add("task-list");
     const update = () => {
         const taskModels = getTasks();
         taskList.innerHTML = "";
         taskModels.forEach((taskModel) => {
-            taskList.appendChild(TaskCard(taskModel).element);
+            taskList.appendChild(TaskCard({ taskModel }).element);
         });
         if (taskList.children.length === 0) {
             taskList.append("You don't have any event !");
@@ -62,7 +62,7 @@ const TaskList = () => {
     update();
     return { element: taskList, update };
 };
-const TaskCard = (taskModel) => {
+const TaskCard = ({ taskModel }) => {
     const task = document.createElement("div");
     task.classList.add("task");
     const title = document.createElement("h3");
@@ -76,11 +76,10 @@ const TaskCard = (taskModel) => {
     const actions = document.createElement("ul");
     actions.classList.add("task__actions");
     const actionsDesc = [
-        { name: "View", onClick: () => { } },
         {
             name: "Edit",
             onClick: () => {
-                const modal = Modal();
+                const modal = Modal({});
                 modal.setTitle("Edit an event");
                 const modalContent = document.createElement("div");
                 console.log(taskModel);
@@ -117,6 +116,12 @@ const TaskCard = (taskModel) => {
             },
         },
     ];
+    if (taskModel.link != undefined) {
+        actionsDesc.unshift({
+            name: "Open Link",
+            onClick: () => (window.location.href = taskModel.link),
+        });
+    }
     actionsDesc.forEach((actionDesc) => {
         const action = document.createElement("li");
         action.textContent = actionDesc.name;
@@ -124,11 +129,14 @@ const TaskCard = (taskModel) => {
         action.classList.add("task__action");
         actions.appendChild(action);
     });
-    task.appendChild(Duration(new Date(taskModel.startDate), new Date(taskModel.endDate)).element);
+    task.appendChild(Duration({
+        startDate: new Date(taskModel.startDate),
+        endDate: new Date(taskModel.endDate),
+    }).element);
     task.appendChild(actions);
     return { element: task };
 };
-const Duration = (startDate, endDate) => {
+const Duration = ({ startDate, endDate }) => {
     const duration = document.createElement("span");
     if (isSameDay(startDate, endDate)) {
         duration.append(`${beautifyDate(startDate)}`);
@@ -138,7 +146,7 @@ const Duration = (startDate, endDate) => {
     }
     return { element: duration };
 };
-const Modal = () => {
+const Modal = ({}) => {
     const pageMask = document.querySelector("#page-mask");
     const root = document.createElement("div");
     root.classList.add("modal");
@@ -177,16 +185,16 @@ const Modal = () => {
     close.addEventListener("click", hide);
     return { element: root, setTitle, setContent, show, hide };
 };
-const Input = (text, options) => {
+const Input = ({ text = "text", type, defaultValue, }) => {
     const root = document.createElement("div");
-    root.classList.add("input", options === null || options === void 0 ? void 0 : options.className);
+    root.classList.add("input");
     const label = document.createElement("label");
     label.textContent = text;
     label.classList.add("input__label");
     const input = document.createElement("input");
-    input.setAttribute("type", options.type || "text");
-    input.value = options.defaultValue || "";
-    input.classList.add("input__field", `input__field-${options.type || "text"}`);
+    input.setAttribute("type", type || "text");
+    input.value = defaultValue || "";
+    input.classList.add("input__field", `input__field-${type || "text"}`);
     const problem = document.createElement("p");
     problem.classList.add("input__problem");
     problem.textContent = "";
@@ -197,33 +205,21 @@ const Input = (text, options) => {
     const value = () => input.value;
     return { element: root, value, setProblem };
 };
-const TaskForm = (options = {}) => {
+const TaskForm = ({ defaultTitle = "", defaultDesc = "", defaultStartDate = "1970-01-01", defaultEndDate = "1970-01-01", defaultLink = "", }) => {
     const form = document.createElement("div");
-    const title = Input("Title*", {
-        type: "text",
-        className: "modal__title",
-        defaultValue: options.defaultTitle,
-    });
-    const desc = Input("Description", {
-        type: "text",
-        className: "modal__desc",
-        defaultValue: options.defaultDesc,
-    });
-    const startDate = Input("Start Date", {
+    const title = Input({ text: "Title*", type: "text", defaultValue: defaultTitle });
+    const desc = Input({ text: "Description", type: "text", defaultValue: defaultDesc });
+    const startDate = Input({
+        text: "Start Date",
         type: "date",
-        className: "modal__start-date",
-        defaultValue: options.defaultStartDate,
+        defaultValue: defaultStartDate,
     });
-    const endDate = Input("End date*", {
+    const endDate = Input({
+        text: "End date*",
         type: "date",
-        className: "modal__end-date",
-        defaultValue: options.defaultEndDate,
+        defaultValue: defaultEndDate,
     });
-    const link = Input("Link", {
-        type: "text",
-        className: "modal__link",
-        defaultValue: options.defaultLink,
-    });
+    const link = Input({ text: "Link", type: "text", defaultValue: defaultLink });
     form.append(title.element, desc.element, startDate.element, endDate.element, link.element);
     const getValues = () => {
         return {
@@ -245,15 +241,15 @@ const TaskForm = (options = {}) => {
     };
 };
 const calendarContainer = document.querySelector(".tasks .container");
-const calendar = Calendar(new Date(Date.now()));
-const taskList = TaskList();
+const calendar = Calendar({ startDate: new Date(Date.now()) });
+const taskList = TaskList({});
 calendarContainer === null || calendarContainer === void 0 ? void 0 : calendarContainer.appendChild(calendar.element);
 calendarContainer === null || calendarContainer === void 0 ? void 0 : calendarContainer.appendChild(taskList.element);
 const addBtn = document.querySelector(".header__button");
 addBtn === null || addBtn === void 0 ? void 0 : addBtn.addEventListener("click", (_) => {
-    const modal = Modal();
+    const modal = Modal({});
     const modalContent = document.createElement("div");
-    const form = TaskForm();
+    const form = TaskForm({});
     modalContent.appendChild(form.element);
     const submit = document.createElement("button");
     submit.textContent = "Save!";
@@ -261,10 +257,10 @@ addBtn === null || addBtn === void 0 ? void 0 : addBtn.addEventListener("click",
     modalContent.appendChild(submit);
     submit.addEventListener("click", () => {
         const values = form.getValues();
-        if (values.title === "" || values.title == undefined) {
+        if (!values.title) {
             return form.titleInput.setProblem("You must provide a title.");
         }
-        if (values.endDate === "" || values.endDate == undefined) {
+        if (!values.endDate) {
             return form.endDateInput.setProblem("You must provide an ending date for the event.");
         }
         const task = Object.assign(Object.assign({}, values), { createdAt: Date.now() });
